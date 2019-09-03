@@ -9,7 +9,7 @@ startParallel <- function(parallel = TRUE, ...)
      stop("packages 'parallel' and 'doParallel' required for parallelization!")
 
   # if a cluster is provided as input argument use that cluster and exit
-  if(any(class(parallel) == "cluster"))
+  if(any(class(parallel) %in% c("cluster", "mpicluster")))
     { cl <- parallel
       parallel <- TRUE
       attr(parallel, "type") <- foreach::getDoParName()

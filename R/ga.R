@@ -164,7 +164,8 @@ ga <- function(type = c("binary", "real-valued", "permutation"),
       { parallel <- stopCluster <- FALSE } 
     }
   else
-    { stopCluster <- if(inherits(parallel, "cluster")) FALSE else TRUE
+    { stopCluster <- if (inherits(parallel, "cluster") | 
+                         is(parallel, "mpicluster")) FALSE else TRUE
       parallel <- startParallel(parallel) 
     }
   on.exit(if(parallel & stopCluster)
