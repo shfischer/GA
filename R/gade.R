@@ -17,9 +17,17 @@ de <- function(fitness,
   args <- list(...)
   args$type <- "real-valued"
   args$nBits <- NULL
+
+  # browser()
+  fitnessArgs <- args[setdiff(names(args), names(eval(formals(ga))))]
+       
   # DE selection including crossover
-  args$selection <- function(...) 
-    gareal_de(..., F = stepsize, p = pcrossover)
+  args$selection <- function(object, ...) 
+  {
+    do.call("gareal_de", c(object, fitnessArgs, 
+                           list(F = stepsize, p = pcrossover)))
+  }
+    # do.call("gareal_de", c(args, list(F = stepsize, p = pcrossover)))
   args$pcrossover <- 0 # skip GA crossover
   if(is.null(args$elitism))
     args$elitism <- 0
@@ -43,8 +51,8 @@ de <- function(fitness,
                                  popSize = popSize)))
   object <- as(object, "de")
   object@call <- call
-  object@pcrossover <- pcrossover
-  object@stepsize <- stepsize
+  object@pcrossover <- as.numeric(pcrossover)
+  object@stepsize <- as.numeric(stepsize)
   
   return(object)
 }
@@ -191,12 +199,10 @@ function(object, ...)
 
 gareal_de <- function(object, F = 0.8, p = 0.5, ...)
 {
-  # browser()
-
   # if(gaControl("useRcpp"))
   #   gareal_de_Rcpp(object, fitness = object@call$fitness, F, p, ...)
   # else
-    gareal_de_R(object, fitness = object@call$fitness, ..., F = F, p = p)
+  gareal_de_R(object, fitness = object@call$fitness, ..., F = F, p = p)
 }
 
 gareal_de_R <- function(object, fitness, ...,
@@ -204,7 +210,7 @@ gareal_de_R <- function(object, fitness, ...,
 {
 # Differential Evolution operator based on the description in Simon (2013)
 # Evolutionary Optimization Algorithms, Sec. 12.4, Fig. 12.12
-# See also http://mfouesneau.github.io/docs/de/
+# See also https://mfouesneau.github.io/docs/de/
 #  
 # object = 'ga' object
 # fitness = the fitness function
